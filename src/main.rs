@@ -2,34 +2,43 @@ use std::io::{self, Write};
 
 fn main() {
     loop {
-        // Affiche le prompt
+        // Prompt
         print!("$ ");
-
-        // Force l'affichage immédiat du prompt
         io::stdout().flush().unwrap();
 
-        // Variable qui contiendra l'entrée utilisateur
+        // Lecture utilisateur
         let mut input = String::new();
 
-        // Lit la ligne tapée
         io::stdin()
             .read_line(&mut input)
-            .expect("Erreur lecture stdin");
+            .expect("Failed to read line");
 
-        // Supprime les espaces et le retour à la ligne
-        let command = input.trim();
+        let input = input.trim();
 
-        // Ignore une ligne vide
-        if command.is_empty() {
+        // Ignore les lignes vides
+        if input.is_empty() {
             continue;
         }
 
-        // Quitte le shell si l'utilisateur tape "exit"
+        // Découpe la commande en morceaux
+        let parts: Vec<&str> = input.split_whitespace().collect();
+
+        let command = parts[0];
+
+        // Builtin exit
         if command == "exit" {
             break;
         }
 
-        // Affiche l'erreur si la commande n'existe pas
-        println!("{}: command not found", command);
+        // Builtin echo
+        if command == "echo" {
+            // Affiche tous les arguments après "echo"
+            let args = &parts[1..];
+
+            println!("{}", args.join(" "));
+        } else {
+            // Commande inconnue
+            println!("{}: command not found", command);
+        }
     }
 }
