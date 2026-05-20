@@ -36,6 +36,19 @@ fn main() {
             let args = &parts[1..];
 
             println!("{}", args.join(" "));
+        } else if command == "type" {
+            // Builtin type
+            if parts.len() < 2 {
+                continue;
+            }
+
+            let target = parts[1];
+
+            if target == "exit" || target == "echo" || target == "type" {
+                println!("{} is a shell builtin", target);
+            } else {
+                println!("{}: not found", target);
+            }
         } else {
             // Commande inconnue
             println!("{}: command not found", command);
