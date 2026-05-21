@@ -2,6 +2,7 @@ use std::env;
 use std::fs;
 use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
+use std::os::unix::process::CommandExt;
 use std::path::Path;
 use std::process::Command;
 
@@ -96,6 +97,7 @@ fn main() {
         else if let Some(executable) = find_executable(command) {
             let args = &parts[1..];
             Command::new(&executable)
+                .arg0(command)
                 .args(args)
                 .status()
                 .expect("Failed to execute process");
