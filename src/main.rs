@@ -60,8 +60,14 @@ fn main() {
                 Err(e) => eprintln!("pwd: {}", e),
             }
         } else if command == "cd" {
-            let target = parts.get(1).copied().unwrap_or("~");
-            match env::set_current_dir(target) {
+            let raw = parts.get(1).copied().unwrap_or("~");
+            // Expand ~ to the value of $HOME
+            let target = if raw == "~" {
+                env::var("HOME").unwrap_or_else(|_| String::from("/"))
+            } else {
+                raw.to_string()
+            };
+            match env::set_current_dir(&target) {
                 Ok(()) => {}
                 Err(_) => eprintln!("cd: {}: No such file or directory", target),
             }
