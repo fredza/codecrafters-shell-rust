@@ -3,6 +3,7 @@ use std::fs;
 use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
+use std::process::Command;
 
 fn is_builtin(command: &str) -> bool {
     matches!(command, "echo" | "exit" | "type")
@@ -64,13 +65,11 @@ fn main() {
         if command == "exit" {
             break;
         }
-
         // echo
         else if command == "echo" {
             let args = &parts[1..];
             println!("{}", args.join(" "));
         }
-
         // type
         else if command == "type" {
             // Vérifie qu'un argument existe
@@ -84,18 +83,23 @@ fn main() {
             if is_builtin(target) {
                 println!("{} is a shell builtin", target);
             }
-
             // Cherche dans PATH
             else if let Some(path) = find_executable(target) {
                 println!("{} is {}", target, path);
             }
-
             // Introuvable
             else {
                 println!("{}: not found", target);
             }
         }
-
+        // Commande externe ou inconnue
+        else if let Some(executable) = find_executable(command) {
+            let args = &parts[1..];
+            Command::new(&executable)
+                .args(args)
+                .status()
+                .expect("Failed to execute process");
+        }
         // Commande inconnue
         else {
             println!("{}: command not found", command);
