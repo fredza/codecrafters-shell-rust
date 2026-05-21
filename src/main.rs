@@ -7,7 +7,7 @@ use std::path::Path;
 use std::process::Command;
 
 fn is_builtin(command: &str) -> bool {
-    matches!(command, "echo" | "exit" | "type")
+    matches!(command, "echo" | "exit" | "pwd" | "type")
 }
 
 fn find_executable(command: &str) -> Option<String> {
@@ -70,6 +70,13 @@ fn main() {
         else if command == "echo" {
             let args = &parts[1..];
             println!("{}", args.join(" "));
+        }
+        // pwd
+        else if command == "pwd" {
+            match env::current_dir() {
+                Ok(path) => println!("{}", path.display()),
+                Err(e) => eprintln!("pwd: {}", e),
+            }
         }
         // type
         else if command == "type" {
